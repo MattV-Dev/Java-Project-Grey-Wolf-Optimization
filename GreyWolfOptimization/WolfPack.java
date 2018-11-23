@@ -23,7 +23,10 @@ public class WolfPack {
 			}
 			
 			pack.add(new Wolf(pos));
+			
 		}
+		
+		
 	}
 	
 	public Wolf findMinimum(Function f, int I) {
@@ -35,7 +38,16 @@ public class WolfPack {
 		double wDeltaBest = Double.POSITIVE_INFINITY;
 		Random rand = new Random();
 		
+
+		System.out.println("Initial:");
+		int cnt = 1;
+		for(Wolf w : pack) {
+			System.out.println("\tWolf#" + cnt++ + ": " + w + ", Value: " + f.eval(w.getPos()));
+		}
+		
 		for(int h=0;h<I;h++) {
+			System.out.println("Iteration: " + h);
+			
 			for(int i=0;i<pack.size();i++) {
 				Wolf w = pack.get(i);
 				for(int j=0;j<w.getPos().size();j++) {
@@ -46,22 +58,36 @@ public class WolfPack {
 						w.setAtIndex(j, uLimits.get(j));
 					}
 				}
-				
+			}
+			
+			wAlphaBest = Double.POSITIVE_INFINITY;
+			wBetaBest = Double.POSITIVE_INFINITY;
+			wDeltaBest = Double.POSITIVE_INFINITY;
+			for(Wolf w : pack) {
 				double fVal = f.eval(w.getPos());
-				
 				if(fVal < wAlphaBest) {
 					wAlpha = w;
 					wAlphaBest = fVal;
 				}
-				if(fVal < wBetaBest && fVal > wAlphaBest) {
+			}
+			for(Wolf w : pack) {
+				double fVal = f.eval(w.getPos());
+				if(fVal < wBetaBest && w != wAlpha) {
 					wBeta = w;
 					wBetaBest = fVal;
 				}
-				if(fVal < wDeltaBest && fVal > wBetaBest && fVal > wAlphaBest) {
+			}
+			for(Wolf w : pack) {
+				double fVal = f.eval(w.getPos());
+				if(fVal < wDeltaBest && w != wBeta && w != wAlpha) {
 					wDelta = w;
 					wDeltaBest = fVal;
 				}
 			}
+			
+			System.out.println(" Alpha: " + wAlpha);
+			System.out.println(" Beta: " + wBeta);
+			System.out.println(" Delta: " + wDelta);
 			
 			double a = h * 2 / (double) I;
 			
@@ -96,8 +122,53 @@ public class WolfPack {
 					
 				}
 			}
+			
+			cnt = 1;
+			for(Wolf w : pack) {
+				System.out.println("\tWolf#" + cnt++ + ": " + w + ", Value: " + f.eval(w.getPos()));
+			}	
 		}
 		
+		for(int i=0;i<pack.size();i++) {
+			Wolf w = pack.get(i);
+			for(int j=0;j<w.getPos().size();j++) {
+				if(w.posAtIndex(j) < lLimits.get(j)) {
+					w.setAtIndex(j, lLimits.get(j));
+				}
+				if(w.posAtIndex(j) > uLimits.get(j)) {
+					w.setAtIndex(j, uLimits.get(j));
+				}
+			}
+		}
+		
+		wAlphaBest = Double.POSITIVE_INFINITY;
+		wBetaBest = Double.POSITIVE_INFINITY;
+		wDeltaBest = Double.POSITIVE_INFINITY;
+		for(Wolf w : pack) {
+			double fVal = f.eval(w.getPos());
+			if(fVal < wAlphaBest) {
+				wAlpha = w;
+				wAlphaBest = fVal;
+			}
+		}
+		for(Wolf w : pack) {
+			double fVal = f.eval(w.getPos());
+			if(fVal < wBetaBest && w != wAlpha) {
+				wBeta = w;
+				wBetaBest = fVal;
+			}
+		}
+		for(Wolf w : pack) {
+			double fVal = f.eval(w.getPos());
+			if(fVal < wDeltaBest && w != wBeta && w != wAlpha) {
+				wDelta = w;
+				wDeltaBest = fVal;
+			}
+		}
+		
+		System.out.println(" Alpha: " + wAlpha);
+		System.out.println(" Beta: " + wBeta);
+		System.out.println(" Delta: " + wDelta);
 		return wAlpha;
 	}
 	
@@ -172,6 +243,8 @@ public class WolfPack {
 				}
 			}
 		}
+		
+		
 		
 		return wAlpha;
 	}

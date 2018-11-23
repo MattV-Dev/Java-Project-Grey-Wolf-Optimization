@@ -12,7 +12,7 @@ public class TestCase {
 			public double eval(List<Double> args) {
 				double wyn = 0;
 				for(Double d : args) {
-					wyn = d * d + 1;
+					wyn = Math.abs(1 / d) + Math.pow(Math.E, d) ;
 				}
 				return wyn;
 			}
@@ -20,12 +20,12 @@ public class TestCase {
 		
 		List<Double> low = new ArrayList<Double>();
 		List<Double> upp = new ArrayList<Double>();
-		low.add(-1.0);
-		upp.add(1.0);
+		low.add(0.0);
+		upp.add(5.0);
 		
-		int N = 100;
+		int N = 10;
 		int D = 1;
-		int I = 100;
+		int I = 30;
 		
 		WolfPack pack = new WolfPack(N, D, low, upp);
 		Wolf solution = pack.findMinimum(f, I);
