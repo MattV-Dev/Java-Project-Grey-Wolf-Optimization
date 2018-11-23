@@ -45,105 +45,6 @@ public class WolfPack {
 			System.out.println("\tWolf#" + cnt++ + ": " + w + ", Value: " + f.eval(w.getPos()));
 		}
 		
-		for(int h=0;h<I;h++) {
-			System.out.println("Iteration: " + h);
-			
-			for(int i=0;i<pack.size();i++) {
-				Wolf w = pack.get(i);
-				for(int j=0;j<w.getPos().size();j++) {
-					if(w.posAtIndex(j) < lLimits.get(j)) {
-						w.setAtIndex(j, lLimits.get(j));
-					}
-					if(w.posAtIndex(j) > uLimits.get(j)) {
-						w.setAtIndex(j, uLimits.get(j));
-					}
-				}
-			}
-			
-			wAlphaBest = Double.POSITIVE_INFINITY;
-			wBetaBest = Double.POSITIVE_INFINITY;
-			wDeltaBest = Double.POSITIVE_INFINITY;
-			for(Wolf w : pack) {
-				double fVal = f.eval(w.getPos());
-				if(fVal < wAlphaBest) {
-					wAlpha = w;
-					wAlphaBest = fVal;
-				}
-			}
-			for(Wolf w : pack) {
-				double fVal = f.eval(w.getPos());
-				if(fVal < wBetaBest && w != wAlpha) {
-					wBeta = w;
-					wBetaBest = fVal;
-				}
-			}
-			for(Wolf w : pack) {
-				double fVal = f.eval(w.getPos());
-				if(fVal < wDeltaBest && w != wBeta && w != wAlpha) {
-					wDelta = w;
-					wDeltaBest = fVal;
-				}
-			}
-			
-			System.out.println(" Alpha: " + wAlpha);
-			System.out.println(" Beta: " + wBeta);
-			System.out.println(" Delta: " + wDelta);
-			
-			double a = h * 2 / (double) I;
-			
-			for(int i=0;i<pack.size();i++) {
-				for(int j=0;j<pack.get(i).getPos().size();j++) {
-					
-					double r1 = rand.nextDouble();
-					double r2 = rand.nextDouble();
-					
-					double A1 = 2 * a * r1 - a;
-					double C1 = 2 * r2;
-					double DAlpha = Math.abs(C1 * wAlpha.posAtIndex(j) - pack.get(i).posAtIndex(j));
-					double X1 = wAlpha.posAtIndex(j) - A1 * DAlpha;
-					
-					r1 = rand.nextDouble();
-					r2 = rand.nextDouble();
-					
-					double A2 = 2 * a * r1 - a;
-					double C2 = 2 * r2;
-					double DBeta = Math.abs(C2 * wBeta.posAtIndex(j) - pack.get(i).posAtIndex(j));
-					double X2 = wBeta.posAtIndex(j) - A2 * DBeta;
-					
-					r1 = rand.nextDouble();
-					r2 = rand.nextDouble();
-					
-					double A3 = 2 * a * r1 - a;
-					double C3 = 2 * r2;
-					double DDelta = Math.abs(C3 * wDelta.posAtIndex(j) - pack.get(i).posAtIndex(j));
-					double X3 = wDelta.posAtIndex(j) - A3 * DDelta;
-					
-					pack.get(i).setAtIndex(j, (X1 + X2 + X3) / 3);
-					
-				}
-			}
-			
-			cnt = 1;
-			for(Wolf w : pack) {
-				System.out.println("\tWolf#" + cnt++ + ": " + w + ", Value: " + f.eval(w.getPos()));
-			}	
-		}
-		
-		for(int i=0;i<pack.size();i++) {
-			Wolf w = pack.get(i);
-			for(int j=0;j<w.getPos().size();j++) {
-				if(w.posAtIndex(j) < lLimits.get(j)) {
-					w.setAtIndex(j, lLimits.get(j));
-				}
-				if(w.posAtIndex(j) > uLimits.get(j)) {
-					w.setAtIndex(j, uLimits.get(j));
-				}
-			}
-		}
-		
-		wAlphaBest = Double.POSITIVE_INFINITY;
-		wBetaBest = Double.POSITIVE_INFINITY;
-		wDeltaBest = Double.POSITIVE_INFINITY;
 		for(Wolf w : pack) {
 			double fVal = f.eval(w.getPos());
 			if(fVal < wAlphaBest) {
@@ -169,45 +70,9 @@ public class WolfPack {
 		System.out.println(" Alpha: " + wAlpha);
 		System.out.println(" Beta: " + wBeta);
 		System.out.println(" Delta: " + wDelta);
-		return wAlpha;
-	}
-	
-	public Wolf findMaximum(Function f, int I) {
-		Wolf wAlpha = null;
-		Wolf wBeta = null;
-		Wolf wDelta = null;
-		double wAlphaBest = Double.NEGATIVE_INFINITY;
-		double wBetaBest = Double.NEGATIVE_INFINITY;
-		double wDeltaBest = Double.NEGATIVE_INFINITY;
-		Random rand = new Random();
 		
 		for(int h=0;h<I;h++) {
-			for(int i=0;i<pack.size();i++) {
-				Wolf w = pack.get(i);
-				for(int j=0;j<w.getPos().size();j++) {
-					if(w.posAtIndex(j) < lLimits.get(j)) {
-						w.setAtIndex(j, lLimits.get(j));
-					}
-					if(w.posAtIndex(j) > uLimits.get(j)) {
-						w.setAtIndex(j, uLimits.get(j));
-					}
-				}
-				
-				double fVal = f.eval(w.getPos());
-				
-				if(fVal > wAlphaBest) {
-					wAlpha = w;
-					wAlphaBest = fVal;
-				}
-				if(fVal > wBetaBest && fVal < wAlphaBest) {
-					wBeta = w;
-					wBetaBest = fVal;
-				}
-				if(fVal > wDeltaBest && fVal < wBetaBest && fVal < wAlphaBest) {
-					wDelta = w;
-					wDeltaBest = fVal;
-				}
-			}
+			System.out.println("Iteration: " + h);
 			
 			double a = h * 2 / (double) I;
 			
@@ -238,13 +103,179 @@ public class WolfPack {
 					double DDelta = Math.abs(C3 * wDelta.posAtIndex(j) - pack.get(i).posAtIndex(j));
 					double X3 = wDelta.posAtIndex(j) - A3 * DDelta;
 					
-					pack.get(i).setAtIndex(j, (X1 + X2 + X3) / 3);
-					
+					pack.get(i).setAtIndex(j, (X1 + X2 + X3) / 3);	
 				}
+			}
+			
+			for(int i=0;i<pack.size();i++) {
+				Wolf w = pack.get(i);
+				for(int j=0;j<w.getPos().size();j++) {
+					if(w.posAtIndex(j) < lLimits.get(j)) {
+						w.setAtIndex(j, lLimits.get(j));
+					}
+					if(w.posAtIndex(j) > uLimits.get(j)) {
+						w.setAtIndex(j, uLimits.get(j));
+					}
+				}
+			}
+			cnt = 1;
+			for(Wolf w : pack) {
+				System.out.println("\tWolf#" + cnt++ + ": " + w + ", Value: " + f.eval(w.getPos()));
+			}	
+			
+			wAlphaBest = Double.POSITIVE_INFINITY;
+			wBetaBest = Double.POSITIVE_INFINITY;
+			wDeltaBest = Double.POSITIVE_INFINITY;
+			for(Wolf w : pack) {
+				double fVal = f.eval(w.getPos());
+				if(fVal < wAlphaBest) {
+					wAlpha = w;
+					wAlphaBest = fVal;
+				}
+			}
+			for(Wolf w : pack) {
+				double fVal = f.eval(w.getPos());
+				if(fVal < wBetaBest && w != wAlpha) {
+					wBeta = w;
+					wBetaBest = fVal;
+				}
+			}
+			for(Wolf w : pack) {
+				double fVal = f.eval(w.getPos());
+				if(fVal < wDeltaBest && w != wBeta && w != wAlpha) {
+					wDelta = w;
+					wDeltaBest = fVal;
+				}
+			}
+			System.out.println(" Alpha: " + wAlpha);
+			System.out.println(" Beta: " + wBeta);
+			System.out.println(" Delta: " + wDelta);
+		}
+		
+		return wAlpha;
+	}
+	
+	public Wolf findMaximum(Function f, int I) {
+		Wolf wAlpha = null;
+		Wolf wBeta = null;
+		Wolf wDelta = null;
+		double wAlphaBest = Double.NEGATIVE_INFINITY;
+		double wBetaBest = Double.NEGATIVE_INFINITY;
+		double wDeltaBest = Double.NEGATIVE_INFINITY;
+		Random rand = new Random();
+		
+		System.out.println("Initial:");
+		int cnt = 1;
+		for(Wolf w : pack) {
+			System.out.println("\tWolf#" + cnt++ + ": " + w + ", Value: " + f.eval(w.getPos()));
+		}
+		
+		for(Wolf w : pack) {
+			double fVal = f.eval(w.getPos());
+			if(fVal > wAlphaBest) {
+				wAlpha = w;
+				wAlphaBest = fVal;
+			}
+		}
+		for(Wolf w : pack) {
+			double fVal = f.eval(w.getPos());
+			if(fVal > wBetaBest && w != wAlpha) {
+				wBeta = w;
+				wBetaBest = fVal;
+			}
+		}
+		for(Wolf w : pack) {
+			double fVal = f.eval(w.getPos());
+			if(fVal > wDeltaBest && w != wBeta && w != wAlpha) {
+				wDelta = w;
+				wDeltaBest = fVal;
 			}
 		}
 		
+		System.out.println(" Alpha: " + wAlpha);
+		System.out.println(" Beta: " + wBeta);
+		System.out.println(" Delta: " + wDelta);
 		
+		for(int h=0;h<I;h++) {
+			System.out.println("Iteration: " + h);
+			
+			double a = h * 2 / (double) I;
+			
+			for(int i=0;i<pack.size();i++) {
+				for(int j=0;j<pack.get(i).getPos().size();j++) {
+					
+					double r1 = rand.nextDouble();
+					double r2 = rand.nextDouble();
+					
+					double A1 = 2 * a * r1 - a;
+					double C1 = 2 * r2;
+					double DAlpha = Math.abs(C1 * wAlpha.posAtIndex(j) - pack.get(i).posAtIndex(j));
+					double X1 = wAlpha.posAtIndex(j) - A1 * DAlpha;
+					
+					r1 = rand.nextDouble();
+					r2 = rand.nextDouble();
+					
+					double A2 = 2 * a * r1 - a;
+					double C2 = 2 * r2;
+					double DBeta = Math.abs(C2 * wBeta.posAtIndex(j) - pack.get(i).posAtIndex(j));
+					double X2 = wBeta.posAtIndex(j) - A2 * DBeta;
+					
+					r1 = rand.nextDouble();
+					r2 = rand.nextDouble();
+					
+					double A3 = 2 * a * r1 - a;
+					double C3 = 2 * r2;
+					double DDelta = Math.abs(C3 * wDelta.posAtIndex(j) - pack.get(i).posAtIndex(j));
+					double X3 = wDelta.posAtIndex(j) - A3 * DDelta;
+					
+					pack.get(i).setAtIndex(j, (X1 + X2 + X3) / 3);	
+				}
+			}
+			
+			for(int i=0;i<pack.size();i++) {
+				Wolf w = pack.get(i);
+				for(int j=0;j<w.getPos().size();j++) {
+					if(w.posAtIndex(j) < lLimits.get(j)) {
+						w.setAtIndex(j, lLimits.get(j));
+					}
+					if(w.posAtIndex(j) > uLimits.get(j)) {
+						w.setAtIndex(j, uLimits.get(j));
+					}
+				}
+			}
+			cnt = 1;
+			for(Wolf w : pack) {
+				System.out.println("\tWolf#" + cnt++ + ": " + w + ", Value: " + f.eval(w.getPos()));
+			}	
+			
+			wAlphaBest = Double.NEGATIVE_INFINITY;
+			wBetaBest = Double.NEGATIVE_INFINITY;
+			wDeltaBest = Double.NEGATIVE_INFINITY;
+			for(Wolf w : pack) {
+				double fVal = f.eval(w.getPos());
+				if(fVal > wAlphaBest) {
+					wAlpha = w;
+					wAlphaBest = fVal;
+				}
+			}
+			for(Wolf w : pack) {
+				double fVal = f.eval(w.getPos());
+				if(fVal > wBetaBest && w != wAlpha) {
+					wBeta = w;
+					wBetaBest = fVal;
+				}
+			}
+			for(Wolf w : pack) {
+				double fVal = f.eval(w.getPos());
+				if(fVal > wDeltaBest && w != wBeta && w != wAlpha) {
+					wDelta = w;
+					wDeltaBest = fVal;
+				}
+			}
+			System.out.println(" Alpha: " + wAlpha);
+			System.out.println(" Beta: " + wBeta);
+			System.out.println(" Delta: " + wDelta);
+		}
 		
 		return wAlpha;
 	}
