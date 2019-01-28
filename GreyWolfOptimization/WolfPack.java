@@ -55,6 +55,11 @@ public class WolfPack {
 		wDeltaBest = Double.POSITIVE_INFINITY;
 		
 	}
+	private void resetWolfBests(Double val) {
+		wAlphaBest = val;
+		wBetaBest = val;
+		wDeltaBest = val;
+	}
 	
 	/**
 	 * Assigns new three best wolves in a pack, default less than comparator
@@ -75,9 +80,6 @@ public class WolfPack {
 	 */
 	private void chooseLeadingWolves(Function f, Comparator comp) {
 
-		wAlphaBest = Double.POSITIVE_INFINITY;
-		wBetaBest = Double.POSITIVE_INFINITY;
-		wDeltaBest = Double.POSITIVE_INFINITY;
 		for(Wolf w : pack) {
 			double fVal = f.eval(w.getPos());
 			if(comp.compare(fVal, wAlphaBest)) {
@@ -165,21 +167,20 @@ public class WolfPack {
 	/**
 	 * Finds a global minimum of a function on a given domain
 	 * @param f - Function to be processed
-	 * @param I - Number of iterations, minimum number of iterations is 10
-	 * @param N - Number of wolves, minimum number of wolves is 3
-	 * @param D - Argument count of function f()
-	 * @param lLimits - lower bounds on the solution
-	 * @param uLimits - upper bounds on the solution
-	 * @return best Wolf in the pack, the best solution produced by the algorithm
+	 * @param parameters - Specially prepared parameter class for wolf pack problems
+	 * @return the best solution produced by the algorithm, packaged as special solution object
+	 * @throws DimensionsUnmatchedException
 	 */
-	public Wolf findMinimum(Function f, int I, int N, int D, List<Double> lLimits, List<Double> uLimits) {
+	public WolfPackSolution findMinimum(Function f, WolfPackParameters parameters) throws DimensionsUnmatchedException {
 		
 		double MaxA = 2.0;
-		double[] progression = new double[I];
+		List<Double> progression = new ArrayList<Double>();
 		
-		initializePack(N, D, lLimits, uLimits);
+		initializePack(parameters.getWolfCount(), parameters.getDimensions(), parameters.getLLimits(), parameters.getULimits());
+		resetWolfBests(Double.POSITIVE_INFINITY);
 		chooseLeadingWolves(f);
 		
+		int I = parameters.getIterations();
 		for(int h=0;h<I;h++) {
 			
 			double a = MaxA - h * MaxA / (double) I;
@@ -187,97 +188,33 @@ public class WolfPack {
 				moveTheWolf(pack.get(i), a);
 			}
 			trimToLimits();
+			resetWolfBests(Double.POSITIVE_INFINITY);
 			chooseLeadingWolves(f);
-			progression[h] = f.eval(wAlpha.getPos());
+			progression.add(f.eval(wAlpha.getPos()));
 		}
-		
-		System.out.println("Best of each iteration");
-		for(int i = 0; i < progression.length; i++) {
-			System.out.println(i + "#: " + progression[i]);
-		}
-		return wAlpha;
-	}
-	
-	/**
-	 * Finds a global minimum of a function on a given domain, logged version
-	 * @param f - Function to be processed
-	 * @param I - Number of iterations, minimum number of iterations is 10
-	 * @param N - Number of wolves, minimum number of wolves is 3
-	 * @param D - Argument count of function f()
-	 * @param lLimits - lower bounds on the solution
-	 * @param uLimits - upper bounds on the solution
-	 * @return best Wolf in the pack, the best solution produced by the algorithm
-	 */
-	public Wolf findMinimumLogged(Function f, int I, int N, int D, List<Double> lLimits, List<Double> uLimits) {
-		
-		double MaxA = 2.0;
-		double[] progression = new double[I];
-		
-		initializePack(N, D, lLimits, uLimits);
-		System.out.println("Initial:");
-		int cnt = 1;
-		for(Wolf w : pack) {
-			System.out.println("\tWolf#" + cnt++ + ": " + w + ", Value: " + f.eval(w.getPos()));
-		}
-		
-		chooseLeadingWolves(f);
-		System.out.println(" Alpha: " + wAlpha);
-		System.out.println(" Beta: " + wBeta);
-		System.out.println(" Delta: " + wDelta);
-		
-		for(int h=0;h<I;h++) {
-			System.out.println("Iteration: " + h);
-			
-			double a = MaxA - h * MaxA / (double) I;
-			System.out.println(" a-coefficient: " + a);
-			
-			for(int i=0;i<pack.size();i++) {
-				moveTheWolf(pack.get(i), a);
-			}
-			
-			trimToLimits();
-			
-			cnt = 1;
-			for(Wolf w : pack) {
-				System.out.println("\tWolf#" + cnt++ + ": " + w + ", Value: " + f.eval(w.getPos()));
-			}
-			chooseLeadingWolves(f);
-			System.out.println(" Alpha: " + wAlpha);
-			System.out.println(" Beta: " + wBeta);
-			System.out.println(" Delta: " + wDelta);
-			
-			progression[h] = f.eval(wAlpha.getPos());
-		}
-		
-		
-		System.out.println("Best of each iteration");
-		for(int i = 0; i < progression.length; i++) {
-			System.out.println(i + "#: " + progression[i]);
-		}
-		return wAlpha;
+		return new WolfPackSolution(wAlpha, progression);
 	}
 	
 	/**
 	 * Finds a global maximum of a function on a given domain
 	 * @param f - Function to be processed
-	 * @param I - Number of iterations, minimum number of iterations is 10
-	 * @param N - Number of wolves, minimum number of wolves is 3
-	 * @param D - Argument count of function f()
-	 * @param lLimits - lower bounds on the solution
-	 * @param uLimits - upper bounds on the solution
-	 * @return best Wolf in the pack, the best solution produced by the algorithm
+	 * @param parameters - Specially prepared parameter class for wolf pack problems
+	 * @return the best solution produced by the algorithm, packaged as special solution object
+	 * @throws DimensionsUnmatchedException
 	 */
-	public Wolf findMaximum(Function f, int I, int N, int D, List<Double> lLimits, List<Double> uLimits) {
+	public WolfPackSolution findMaximum(Function f, WolfPackParameters parameters) throws DimensionsUnmatchedException  {
 		
 		double MaxA = 2.0;
-		double[] progression = new double[I];
+		List<Double> progression = new ArrayList<Double>();
 		Comparator comp = new Comparator() {
 			public boolean compare(double x, double y) { return x > y;}
 		};
 		
-		initializePack(N, D, lLimits, uLimits);
+		initializePack(parameters.getWolfCount(), parameters.getDimensions(), parameters.getLLimits(), parameters.getULimits());
+		resetWolfBests(Double.NEGATIVE_INFINITY);
 		chooseLeadingWolves(f, comp);
 		
+		int I = parameters.getIterations();
 		for(int h=0;h<I;h++) {
 			
 			double a = MaxA - h * MaxA / (double) I;
@@ -285,76 +222,10 @@ public class WolfPack {
 				moveTheWolf(pack.get(i), a);
 			}
 			trimToLimits();
+			resetWolfBests(Double.NEGATIVE_INFINITY);
 			chooseLeadingWolves(f, comp);
-			progression[h] = f.eval(wAlpha.getPos());
+			progression.add(f.eval(wAlpha.getPos()));
 		}
-		
-		System.out.println("Best of each iteration");
-		for(int i = 0; i < progression.length; i++) {
-			System.out.println(i + "#: " + progression[i]);
-		}
-		return wAlpha;
-	}
-	
-	/**
-	 * Finds a global maximum of a function on a given domain, logged version
-	 * @param f - Function to be processed
-	 * @param I - Number of iterations, minimum number of iterations is 10
-	 * @param N - Number of wolves, minimum number of wolves is 3
-	 * @param D - Argument count of function f()
-	 * @param lLimits - lower bounds on the solution
-	 * @param uLimits - upper bounds on the solution
-	 * @return best Wolf in the pack, the best solution produced by the algorithm
-	 */
-	public Wolf findMaximumLogged(Function f, int I, int N, int D, List<Double> lLimits, List<Double> uLimits) {
-		
-		double MaxA = 2.0;
-		double[] progression = new double[I];
-		Comparator comp = new Comparator() {
-			public boolean compare(double x, double y) { return x > y;}
-		};
-		
-		initializePack(N, D, lLimits, uLimits);
-		System.out.println("Initial:");
-		int cnt = 1;
-		for(Wolf w : pack) {
-			System.out.println("\tWolf#" + cnt++ + ": " + w + ", Value: " + f.eval(w.getPos()));
-		}
-		
-		chooseLeadingWolves(f, comp);
-		System.out.println(" Alpha: " + wAlpha);
-		System.out.println(" Beta: " + wBeta);
-		System.out.println(" Delta: " + wDelta);
-		
-		for(int h=0;h<I;h++) {
-			System.out.println("Iteration: " + h);
-			
-			double a = MaxA - h * MaxA / (double) I;
-			System.out.println(" a-coefficient: " + a);
-			
-			for(int i=0;i<pack.size();i++) {
-				moveTheWolf(pack.get(i), a);
-			}
-			
-			trimToLimits();
-			
-			cnt = 1;
-			for(Wolf w : pack) {
-				System.out.println("\tWolf#" + cnt++ + ": " + w + ", Value: " + f.eval(w.getPos()));
-			}
-			chooseLeadingWolves(f, comp);
-			System.out.println(" Alpha: " + wAlpha);
-			System.out.println(" Beta: " + wBeta);
-			System.out.println(" Delta: " + wDelta);
-			
-			progression[h] = f.eval(wAlpha.getPos());
-		}
-		
-		
-		System.out.println("Best of each iteration");
-		for(int i = 0; i < progression.length; i++) {
-			System.out.println(i + "#: " + progression[i]);
-		}
-		return wAlpha;
+		return new WolfPackSolution(wAlpha, progression);
 	}
 }
